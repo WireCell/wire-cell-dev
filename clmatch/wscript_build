@@ -1,1 +1,2 @@
-bld.smplpkg('WireCellGen', use='WireCellAux')
+bld.smplpkg('WireCellDevCLMatch', use='WCT SPDLOG JSONCPP BOOST ROOTSYS EIGEN FFTW')
+# WireCellAux WireCellIface WireCellUtil
