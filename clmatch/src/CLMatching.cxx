@@ -104,4 +104,7 @@ bool WireCell::CLMatch::CLMatching::operator()(const input_vector& invec, output
     }
     log->debug(em("dump live+dead to bee"));
 
+    // TODO: actual impl.
+    out = invec[0];
+    return true;
 }

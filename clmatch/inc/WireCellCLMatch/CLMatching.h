@@ -31,7 +31,7 @@ namespace WireCell::CLMatch {
         // refer to MultiAlgBlobClustering for the following
         std::string m_inpath{"pointtrees/%d"};
         std::string m_outpath{"pointtrees/%d"};
-        std::string m_bee_dir {""};
+        std::string m_bee_dir {"data"};
     };
 }
 
