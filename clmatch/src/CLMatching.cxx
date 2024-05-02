@@ -101,8 +101,9 @@ bool WireCell::CLMatch::CLMatching::operator()(const input_vector& invec, output
         std::string sub_dir = String::format("%s/%d", m_bee_dir, charge_ident);
         Persist::assuredir(sub_dir);
         CLMatch::dump_bee_3d(*root_live.get(), String::format("%s/%d-img.json", sub_dir, charge_ident));
+        CLMatch::dump_bee_flash(invec[1], String::format("%s/%d-op.json", sub_dir, charge_ident));
     }
-    log->debug(em("dump live+dead to bee"));
+    log->debug(em("dump bee"));
 
     // TODO: actual impl.
     out = invec[0];
