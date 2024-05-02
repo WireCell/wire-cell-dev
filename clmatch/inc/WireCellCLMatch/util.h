@@ -5,6 +5,7 @@
 
 namespace WireCell::CLMatch {
     void dump_bee_3d(const PointCloud::Tree::Points::node_t& root, const std::string& fn);
+    void dump_bee_flash(const PointCloud::Tree::Points::node_t& root, const std::string& fn);
 }
 
 #endif
