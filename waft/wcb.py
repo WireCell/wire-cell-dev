@@ -17,7 +17,7 @@ mydir = osp.dirname(__file__)
 ## These are packages descriptions which fit the generic functions.
 ## They will be checked in order so put any dependencies first.
 package_descriptions = [
-    ("WCT",      dict(incs=["WireCellUtil/Units.h"], libs=["WireCellUtil"], mandatory=True)),
+    ("WCT",      dict(incs=["WireCellUtil/Units.h"], libs=["WireCellAux", "WireCellIface", "WireCellUtil", "WireCellImg"], mandatory=True)),
 
     # spdlog is "header only" but use library version for faster recompilation
     # wire-cell-util and ZIO both use this
