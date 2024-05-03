@@ -111,76 +111,59 @@ void WireCell::CLMatch::dump_bee_3d(const Points::node_t& root, const std::strin
 }
 
 #include <json/json.h>
-namespace {
-
-std::string create_json_object(const std::vector<double>& opt_t, const std::vector<double>& op_peTotal, const std::vector<std::vector<double>>& op_pes, int cluster_id, int id)
-{
-    Json::Value data;
-    data["op_t"] = Json::Value(Json::arrayValue);
-    for (const auto& val : opt_t) {
-        data["op_t"].append(val);
-    }
-
-    data["op_peTotal"] = Json::Value(Json::arrayValue);
-    for (const auto& val : op_peTotal) {
-        data["op_peTotal"].append(val);
-    }
-
-    data["op_pes"] = Json::Value(Json::arrayValue);
-    for (const auto& pes_one_flash : op_pes) {
-        auto val = Json::Value(Json::arrayValue);
-        for (const auto& pe : pes_one_flash) {
-            val.append(pe);
-        }
-        data["op_pes"].append(val);
-    }
-
-    data["op_l1_t"] = Json::Value(Json::arrayValue);
-    for (size_t i = 0; i < opt_t.size(); ++i) {
-        data["op_l1_t"].append(Json::Value(Json::arrayValue));
-    }
-
-    data["op_l1_pe"] = Json::Value(Json::arrayValue);
-    for (size_t i = 0; i < opt_t.size(); ++i) {
-        data["op_l1_pe"].append(Json::Value(Json::arrayValue));
-    }
-
-    data["op_pes_pred"] = data["op_pes"];
-
-    data["cluster_id"] = cluster_id;
-    data["op_nomatching_cluster_ids"] = Json::Value(Json::arrayValue);
-    data["runNo"] = 0;
-    data["subRunNo"] = 0;
-    data["eventNo"] = id;
-    data["geom"] = "sbnd";
-
-    Json::StreamWriterBuilder writer;
-    writer["indentation"] = "    ";
-    std::string jsonString = Json::writeString(writer, data);
-
-    return jsonString;
-}
-
-} // namespace
 
 void WireCell::CLMatch::dump_bee_flash(const ITensorSet::pointer& ts, const std::string& fn)
 {
     using spdlog::debug;
-
     const auto& tens = ts->tensors();
     if (tens->size() != 1) {
         raise<ValueError>("Expected 1 tensor, got %d", tens->size());
     }
-
     const auto& ten = tens->at(0);
-
     typedef boost::multi_array<double, 2> MultiArray;
     boost::array<MultiArray::index, 2> shape = {ten->shape()[0], ten->shape()[1]};
     boost::multi_array_ref<double, 2> mar((double*)ten->data(), shape);
+
+    Json::Value data;
+    data["runNo"] = 0;
+    data["subRunNo"] = 0;
+    data["eventNo"] = 0;
+    data["geom"] = "sbnd";
+    data["op_t"] = Json::Value(Json::arrayValue);
+    data["op_pes"] = Json::Value(Json::arrayValue);
+    data["op_pes_pred"] = Json::Value(Json::arrayValue);
+    data["op_peTotal"] = Json::Value(Json::arrayValue);
+    data["cluster_id"] = Json::Value(Json::arrayValue);
+    data["op_nomatching_cluster_ids"] = Json::Value(Json::arrayValue);
+
+    debug("shape: {} {}", shape[0], shape[1]);
     for (size_t i = 0; i < shape[0]; ++i) {
-        for (size_t j = 0; j < shape[1]; ++j) {
-            std::cout << mar[i][j] << " ";
+        data["op_t"].append(mar[i][0]);
+        data["cluster_id"].append(i);
+        double op_peTotal = 0;
+        auto op_pes = Json::Value(Json::arrayValue);
+        for (size_t j = 1; j < shape[1]; ++j) {
+            op_peTotal += mar[i][j];
+            op_pes.append(mar[i][j]);
+            // std::cout << mar[i][j] << " ";
         }
-        std::cout << std::endl;
+        data["op_peTotal"].append(op_peTotal);
+        data["op_pes"].append(op_pes);
+        data["op_pes_pred"].append(op_pes);
+        // std::cout << std::endl;
+    }
+
+    // Write cfg to file
+    std::ofstream file(fn);
+    if (file.is_open()) {
+        Json::StreamWriterBuilder writer;
+        writer["indentation"] = "    ";
+        writer["precision"] = 6; // significant digits
+        std::unique_ptr<Json::StreamWriter> jsonWriter(writer.newStreamWriter());
+        jsonWriter->write(data, &file);
+        file.close();
+    }
+    else {
+        raise<ValueError>("Failed to open file: " + fn);
     }
 }
