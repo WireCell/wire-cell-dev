@@ -3,6 +3,7 @@
 
 #include "WireCellIface/ITensorSetFanin.h"
 #include "WireCellIface/IConfigurable.h"
+#include "WireCellIface/IAnodePlane.h"
 #include "WireCellAux/Logger.h"
 
 namespace WireCell::CLMatch {
@@ -27,6 +28,8 @@ namespace WireCell::CLMatch {
         size_t m_count{0};
         // Currently can only be 2, TODO: remove this?
         size_t m_multiplicity {2};
+        
+        IAnodePlane::pointer m_anode {nullptr};
 
         // refer to MultiAlgBlobClustering for the following
         std::string m_inpath{"pointtrees/%d"};

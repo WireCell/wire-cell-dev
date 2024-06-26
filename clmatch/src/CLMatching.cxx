@@ -36,6 +36,8 @@ std::vector<std::string> WireCell::CLMatch::CLMatching::input_types()
 
 void WireCell::CLMatch::CLMatching::configure(const WireCell::Configuration& cfg)
 {
+    m_anode = Factory::find_tn<IAnodePlane>(cfg["anode"].asString());
+
     m_inpath = get(cfg, "inpath", m_inpath);
     m_outpath = get(cfg, "outpath", m_outpath);
     m_bee_dir = get(cfg, "bee_dir", m_bee_dir);
@@ -100,8 +102,8 @@ bool WireCell::CLMatch::CLMatching::operator()(const input_vector& invec, output
     if (!m_bee_dir.empty()) {
         std::string sub_dir = String::format("%s/%d", m_bee_dir, charge_ident);
         Persist::assuredir(sub_dir);
-        CLMatch::dump_bee_3d(*root_live.get(), String::format("%s/%d-img.json", sub_dir, charge_ident));
-        CLMatch::dump_bee_flash(invec[1], String::format("%s/%d-op.json", sub_dir, charge_ident));
+        CLMatch::dump_bee_3d(*root_live.get(), String::format("%s/%d-img-apa%d.json", sub_dir, charge_ident, m_anode->ident()));
+        CLMatch::dump_bee_flash(invec[1], String::format("%s/%d-op-apa%d.json", sub_dir, charge_ident, m_anode->ident()));
     }
     log->debug(em("dump bee"));
 
